@@ -215,7 +215,7 @@ struct EuclideanDistance {
     }
 };
 
-struct EuclideanDistance {
+struct HeomDistance {
     template <typename T>
     void operator()(StridedView2D<T> out, StridedView2D<const T> x, StridedView2D<const T> y) const {
         transform_reduce_2d_(out, x, y, [](T x, T y) INLINE_LAMBDA {
