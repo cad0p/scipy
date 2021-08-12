@@ -562,6 +562,11 @@ PYBIND11_MODULE(_distance_pybind, m) {
               return pdist(out, x, w, EuclideanDistance{});
           },
           "x"_a, "w"_a=py::none(), "out"_a=py::none());
+    m.def("pdist_heom",
+          [](py::object x, py::object w, py::object out) {
+              return pdist(out, x, w, HeomDistance{});
+          },
+          "x"_a, "w"_a=py::none(), "out"_a=py::none());
     m.def("pdist_minkowski",
           [](py::object x, py::object w, py::object out, double p) {
               if (p == 1.0) {

@@ -215,6 +215,26 @@ struct EuclideanDistance {
     }
 };
 
+struct EuclideanDistance {
+    template <typename T>
+    void operator()(StridedView2D<T> out, StridedView2D<const T> x, StridedView2D<const T> y) const {
+        transform_reduce_2d_(out, x, y, [](T x, T y) INLINE_LAMBDA {
+            auto diff = std::abs(x - y);
+            return diff * diff;
+        },
+        [](T x) { return std::sqrt(x); });
+    }
+
+    template <typename T>
+    void operator()(StridedView2D<T> out, StridedView2D<const T> x, StridedView2D<const T> y, StridedView2D<const T> w) const {
+        transform_reduce_2d_(out, x, y, w, [](T x, T y, T w) INLINE_LAMBDA {
+            auto diff = std::abs(x - y);
+            return w * (diff * diff);
+        },
+        [](T x) { return std::sqrt(x); });
+    }
+};
+
 struct ChebyshevDistance {
     template <typename T>
     void operator()(StridedView2D<T> out, StridedView2D<const T> x, StridedView2D<const T> y) const {

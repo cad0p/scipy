@@ -85,6 +85,7 @@ __all__ = [
     'directed_hausdorff',
     'euclidean',
     'hamming',
+    'heom',
     'is_valid_dm',
     'is_valid_y',
     'jaccard',
@@ -1839,6 +1840,11 @@ _METRIC_INFOS = [
         dist_func=hamming,
         cdist_func=CDistWeightedMetricWrapper('hamming', 'hamming'),
         pdist_func=PDistWeightedMetricWrapper('hamming', 'hamming'),
+    ),
+    MetricInfo(
+        canonical_name='heom',
+        aka={'heom', 'he'},
+        pdist_func=_distance_pybind.pdist_heom,
     ),
     MetricInfo(
         canonical_name='jaccard',
