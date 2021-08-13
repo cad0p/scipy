@@ -610,6 +610,11 @@ PYBIND11_MODULE(_distance_pybind, m) {
               return cdist(out, x, y, w, EuclideanDistance{});
           },
           "x"_a, "y"_a, "w"_a=py::none(), "out"_a=py::none());
+    m.def("cdist_heom",
+          [](py::object x, py::object y, py::object w, py::object out) {
+              return cdist(out, x, y, w, EuclideanDistance{});
+          },
+          "x"_a, "y"_a, "w"_a=py::none(), "out"_a=py::none());
     m.def("cdist_minkowski",
           [](py::object x, py::object y, py::object w, py::object out,
              double p) {

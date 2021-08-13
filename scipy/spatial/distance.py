@@ -115,7 +115,7 @@ import dataclasses
 
 from typing import List, Optional, Set, Callable
 
-from functools import partial
+from functools import partial, update_wrapper
 from scipy._lib._util import _asarray_validated
 from scipy._lib.deprecation import _deprecated
 
@@ -597,6 +597,22 @@ def euclidean(u, v, w=None):
     """
     return minkowski(u, v, p=2, w=w)
 
+
+def heom(u, v, cat_ix=None, num_ix=None, range=None):
+    # Initialise results' array
+    # results_array = np.zeros(u.shape)
+    
+    # # Calculate the distance for categorical elements
+    # results_array[cat_ix] = np.not_equal(u[cat_ix], v[cat_ix]) * 1 # use "* 1" to convert it into int
+
+    # # Calculate the distance for numerical elements
+    # results_array[num_ix] = np.abs(u[num_ix] - v[num_ix]) / range[num_ix]
+
+    # # Return the final result
+    # # Square root is not computed in practice
+    # # As it doesn't change similarity between instances
+    # return np.sum(np.square(results_array))
+    return minkowski(u, v, p=2, w=w)
 
 def sqeuclidean(u, v, w=None):
     """
@@ -1844,6 +1860,8 @@ _METRIC_INFOS = [
     MetricInfo(
         canonical_name='heom',
         aka={'heom', 'he'},
+        dist_func=euclidean,
+        cdist_func=_distance_pybind.cdist_heom,
         pdist_func=_distance_pybind.pdist_heom,
     ),
     MetricInfo(
