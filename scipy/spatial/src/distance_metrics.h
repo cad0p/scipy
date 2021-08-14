@@ -227,37 +227,20 @@ struct HeomDistance {
 
     template <typename T>
     void operator()(StridedView2D<T> out, StridedView2D<const T> x, StridedView2D<const T> y, StridedView2D<const T> w) const {
-        for (intptr_t i = 0; i < x.shape[0]; ++i) {
-            T dist = 0;
-            T result = 0;
-            for (intptr_t j = 0; j < x.shape[1]; ++j) {
-
-                 if (j >= 2) {
-                    if (x(i, j) != y(i, j))
-                        result = 1.0;
-                    else
-                        result = 0.0;
-                } else {
-                    result = std::abs(x(i, j) - y(i, j)) / w(i, j);
-                }
-                dist = dist + std::pow(result,2);
+        
+        transform_reduce_2d_(out, x, y, w, [](T x, T y, T w) INLINE_LAMBDA {
+            double diff = 0.0;
+            if (w == 0) {
+                if (x != y)
+                    diff = 1.0;
+                else
+                    diff = 0.0;
+            } else {
+                diff = std::abs(x - y) / w;
             }
-            out(i, 0) = dist;
-        }
-        // transform_reduce_2d_(out, x, y, w, [](T x, T y, T w) INLINE_LAMBDA {
-        //     double diff = 0.0;
-        //     if (i < 2) {
-        //         if (x != y)
-        //             diff = 1.0;
-        //         else
-        //             diff = 0.0;
-        //     } else {
-        //         diff = std::abs(x - y) / w;
-        //     }
-        //     i = i+1;
-        //     return diff * diff;
-        // },
-        // [](T x) { return std::sqrt(x); });
+            return diff * diff;
+        },
+        [](T x) { return x;});
     }
 };
 

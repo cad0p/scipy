@@ -83,7 +83,8 @@ X = np.array([[0.75862, 0.5, 0.33333, 0., 0., 0.8],
             [0.68966, 0.8, 0.33333, 0.25, 1., 0.2],
             [0.55172, 0.6, 0.16667, 0., 1., 0.8]])
 w = np.nanmax(X, axis = 0) - np.nanmin(X, axis = 0)
+w[2:] = 0
 
 print(pdist(X, metric="euclidean"))
 print(pdist(X, metric="heom", w=w))
-print(pdist(X, metric=HEOM(X, cat_ix=[]).heom))
+print(pdist(X, metric=HEOM(X, cat_ix=[2,3,4,5]).heom))
