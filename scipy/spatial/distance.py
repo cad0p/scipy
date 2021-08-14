@@ -598,8 +598,34 @@ def euclidean(u, v, w=None):
     return minkowski(u, v, p=2, w=w)
 
 
-def heom(u, v, cat_ix=None, num_ix=None, range=None):
-    # Initialise results' array
+def heom(u, v, w=None):
+    """
+    Computes the HEOM distance between two 1-D arrays.
+
+    If w is None, then the Euclidean distance is returned.
+
+    Parameters
+    ----------
+    u : (N,) array_like
+        Input array.
+    v : (N,) array_like
+        Input array.
+    w : ranges of each variable
+
+    Returns
+    -------
+    heom : double
+        The HEOM distance between vectors `u` and `v` if w is not None,
+        else return the Euclidean distance.
+
+    """
+    # if w is None:
+    #     return minkowski(u, v, p=2, w=w)
+
+    # cat_ix = w["cat_ix"]
+    # num_ix = w["num_ix"]
+    # range = w["range"]
+    # #Initialise results' array
     # results_array = np.zeros(u.shape)
     
     # # Calculate the distance for categorical elements
