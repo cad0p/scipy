@@ -632,7 +632,49 @@ def heom(u, v, w=None):
 
     # Calculate the distance for numerical elements
     num_ix = w != 0
-    results_array[num_ix] = np.abs(u[num_ix] - v[num_ix]) / range[num_ix]
+    results_array[num_ix] = np.abs(u[num_ix] - v[num_ix]) / w[num_ix]
+
+    # Return the final result
+    # Square root is not computed in practice
+    # As it doesn't change similarity between instances
+    return np.sum(np.square(results_array))
+
+def wheom(u, v, w=None):
+    """
+    Computes the weighted HEOM distance between two 1-D arrays.
+
+    If w is None, then the Euclidean distance is returned.
+
+    Parameters
+    ----------
+    u : (N,) array_like
+        Input array.
+    v : (N,) array_like
+        Input array.
+    w : weight of each variable. Each variable must be already normalized, so that the weight of
+        numerical variables is always 1.0, and the weight of categorical variables depend on the
+        cardinality/levels of the variables, given by this formula: w = 0.5 * (#levels / (#levels-1))
+
+    Returns
+    -------
+    heom : double
+        The weighted HEOM distance between vectors `u` and `v` if w is not None,
+        else return the Euclidean distance.
+
+    """
+    if w is None:
+        return minkowski(u, v, p=2, w=w)
+
+    #Initialise results' array
+    results_array = np.zeros(u.shape)
+    
+    # Calculate the distance for categorical elements
+    cat_ix = w != 1.0
+    results_array[cat_ix] = np.not_equal(u[cat_ix], v[cat_ix]) * w[cat_ix]
+
+    # Calculate the distance for numerical elements
+    num_ix = w == 1.0
+    results_array[num_ix] = np.abs(u[num_ix] - v[num_ix]) / w[num_ix]
 
     # Return the final result
     # Square root is not computed in practice
@@ -1885,9 +1927,16 @@ _METRIC_INFOS = [
     MetricInfo(
         canonical_name='heom',
         aka={'heom', 'he'},
-        dist_func=euclidean,
+        dist_func=heom,
         cdist_func=_distance_pybind.cdist_heom,
         pdist_func=_distance_pybind.pdist_heom,
+    ),
+    MetricInfo(
+        canonical_name='wheom',
+        aka={'wheom', 'whe'},
+        dist_func=wheom,
+        cdist_func=_distance_pybind.cdist_wheom,
+        pdist_func=_distance_pybind.pdist_wheom,
     ),
     MetricInfo(
         canonical_name='jaccard',

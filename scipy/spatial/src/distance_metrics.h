@@ -230,13 +230,42 @@ struct HeomDistance {
         
         transform_reduce_2d_(out, x, y, w, [](T x, T y, T w) INLINE_LAMBDA {
             double diff = 0.0;
-            if (w == 0) {
+            if (w == 1) {
+                diff = std::abs(x - y) / w;
+            } else {
                 if (x != y)
                     diff = 1.0;
                 else
                     diff = 0.0;
-            } else {
+            }
+            return diff * diff;
+        },
+        [](T x) { return x;});
+    }
+};
+
+struct WeightedHeomDistance {
+    template <typename T>
+    void operator()(StridedView2D<T> out, StridedView2D<const T> x, StridedView2D<const T> y) const {
+        transform_reduce_2d_(out, x, y, [](T x, T y) INLINE_LAMBDA {
+            auto diff = std::abs(x - y);
+            return diff * diff;
+        },
+        [](T x) { return std::sqrt(x); });
+    }
+
+    template <typename T>
+    void operator()(StridedView2D<T> out, StridedView2D<const T> x, StridedView2D<const T> y, StridedView2D<const T> w) const {
+        
+        transform_reduce_2d_(out, x, y, w, [](T x, T y, T w) INLINE_LAMBDA {
+            double diff = 0.0;
+            if (w == 1) {
                 diff = std::abs(x - y) / w;
+            } else {
+                if (x != y)
+                    diff = 1.0*w;
+                else
+                    diff = 0.0;
             }
             return diff * diff;
         },
