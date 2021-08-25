@@ -79,9 +79,12 @@ class HEOM():
         # Square root is not computed in practice
         # As it doesn't change similarity between instances
         return np.sum(np.square(results_array))
-X = np.array([[0.758621, 0.4    , 0.59   , 0.33333, 0.     , 0.],
-       [0.689655, 0.8    , 0.11   , 0.33333, 0.25   , 1.],
-       [0.55172, 0.6    , 0.59   , 0.16667, 0.     , 1.]])
+X = np.array([[0.758621, 0.4    , 0.59   , 0.33333, 0.     , 0., 0.039604, 0.037037],
+       [0.689655, 0.8    , 0.11   , 0.33333, 0.25   , 1., 0.455446, 0.333333],
+       [0.55172, 0.6    , 0.59   , 0.16667, 0.     , 1., 0.089109, 0.185185]])
+X_vdm = np.array([[29, 4    , 7   , 0.33333, 0.     , 0., 0.039604, 0.037037],
+       [25, 8    , 1   , 0.33333, 0.25   , 1., 0.455446, 0.333333],
+       [17, 6    , 7   , 0.16667, 0.     , 1., 0.089109, 0.185185]])
 #w = np.nanmax(X, axis = 0) - np.nanmin(X, axis = 0)
 w = np.zeros((1,6))
 w[:3] = 1.0
@@ -92,4 +95,4 @@ hvdm_w = [1]*6
 # print(pdist(X, metric="euclidean"))
 # print(pdist(X[:2], metric="wheom", w=wheom_w))
 # print(pdist(X, metric=HEOM(X, cat_ix=[2,3,4,5]).heom))
-print(pdist(X[:], metric="hvdm"))
+print(pdist(X_vdm[:], metric="vdm"))

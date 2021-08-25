@@ -572,6 +572,11 @@ PYBIND11_MODULE(_distance_pybind, m) {
               return pdist(out, x, w, WeightedHeomDistance{});
           },
           "x"_a, "w"_a=py::none(), "out"_a=py::none());
+    m.def("pdist_vdm",
+          [](py::object x, py::object w, py::object out) {
+              return pdist(out, x, w, VdmDistance{});
+          },
+          "x"_a, "w"_a=py::none(), "out"_a=py::none());
     m.def("pdist_hvdm",
           [](py::object x, py::object w, py::object out) {
               return pdist(out, x, w, HvdmDistance{});
@@ -628,6 +633,11 @@ PYBIND11_MODULE(_distance_pybind, m) {
     m.def("cdist_wheom",
           [](py::object x, py::object y, py::object w, py::object out) {
               return cdist(out, x, y, w, WeightedHeomDistance{});
+          },
+          "x"_a, "y"_a, "w"_a=py::none(), "out"_a=py::none());
+    m.def("cdist_vdm",
+          [](py::object x, py::object y, py::object w, py::object out) {
+              return cdist(out, x, y, w, VdmDistance{});
           },
           "x"_a, "y"_a, "w"_a=py::none(), "out"_a=py::none());
     m.def("cdist_hvdm",

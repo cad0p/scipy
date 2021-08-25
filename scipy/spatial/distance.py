@@ -87,6 +87,7 @@ __all__ = [
     'hamming',
     'heom',
     'wheom',
+    'vdm',
     'hvdm'
     'is_valid_dm',
     'is_valid_y',
@@ -682,6 +683,43 @@ def wheom(u, v, w=None):
     # Square root is not computed in practice
     # As it doesn't change similarity between instances
     return np.sum(np.square(results_array))
+def vdm(u, v, w=None):
+    """
+    Computes the Euclidean distance between two 1-D arrays.
+
+    The Euclidean distance between 1-D arrays `u` and `v`, is defined as
+
+    .. math::
+
+       {||u-v||}_2
+
+       \\left(\\sum{(w_i |(u_i - v_i)|^2)}\\right)^{1/2}
+
+    Parameters
+    ----------
+    u : (N,) array_like
+        Input array.
+    v : (N,) array_like
+        Input array.
+    w : (N,) array_like, optional
+        The weights for each value in `u` and `v`. Default is None,
+        which gives each value a weight of 1.0
+
+    Returns
+    -------
+    euclidean : double
+        The Euclidean distance between vectors `u` and `v`.
+
+    Examples
+    --------
+    >>> from scipy.spatial import distance
+    >>> distance.euclidean([1, 0, 0], [0, 1, 0])
+    1.4142135623730951
+    >>> distance.euclidean([1, 1, 0], [0, 1, 0])
+    1.0
+
+    """
+    return minkowski(u, v, p=2, w=w)
 
 def hvdm(u, v, w=None):
     """
@@ -1977,6 +2015,13 @@ _METRIC_INFOS = [
         dist_func=wheom,
         cdist_func=_distance_pybind.cdist_wheom,
         pdist_func=_distance_pybind.pdist_wheom,
+    ),
+    MetricInfo(
+        canonical_name='vdm',
+        aka={'vdm'},
+        dist_func=vdm,
+        cdist_func=_distance_pybind.cdist_vdm,
+        pdist_func=_distance_pybind.pdist_vdm,
     ),
     MetricInfo(
         canonical_name='hvdm',
