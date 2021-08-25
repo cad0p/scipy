@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include "views.h"
+#include <iostream>
 
 #ifdef __GNUC__
 #define ALWAYS_INLINE inline __attribute__((always_inline))
@@ -270,6 +271,116 @@ struct WeightedHeomDistance {
             return diff * diff;
         },
         [](T x) { return x;});
+    }
+};
+
+struct HvdmDistance {
+    int dim[3] = {7, 7, 7};
+    double counts[7*7*7] = {    0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,   569.,   155.,   223.,   340.,   183.,
+         120.,  1590.,   769.,  1412.,  2093.,  2095.,  1058.,   483.,
+        7910.,   655.,   808.,  2260.,  4048.,  2862.,  1205., 11838.,
+          61.,   134.,   383.,   780.,   692.,   344.,  2394.,    58.,
+          81.,   217.,   437.,   546.,   363.,  1702.,    12.,    29.,
+          93.,   242.,   255.,   168.,   799.,    15.,    28.,    43.,
+         100.,    88.,    98.,   372.,  1028.,  1176.,  2057.,  2937.,
+        1536.,   691.,  9425.,   484.,   631.,  1620.,  2474.,  1775.,
+         712.,  7696.,   162.,   261.,   673.,  1069.,   883.,   346.,
+        3394.,   116.,   142.,   224.,   350.,   354.,   300.,  1486.,
+         349.,   437.,   738.,  1212.,  1136.,   732.,  4604.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,  1412.,  1266.,  2851.,
+        4127.,  2622.,  1163., 13441.,   727.,  1381.,  2461.,  3915.,
+        3062.,  1618., 13164.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.,     0.,
+           0.,     0.,     0.,     0.,     0.,     0.,     0.};
+    int values_per_col[6] = {0, 0, 0, 7, 5, 2};
+    int target_values = dim[2]-1;
+
+    template <typename T>
+    void operator()(StridedView2D<T> out, StridedView2D<const T> x, StridedView2D<const T> y) const {
+
+        for (intptr_t row = 0; row < x.shape[0]; ++row) {
+            T dist = 0;
+            for (intptr_t col = 0; col < x.shape[1]; ++col) {
+                int cats = values_per_col[col];
+                // categorical variables
+                if (cats > 0) {
+                    int i = col;
+                    int j = round((cats - 1)*x(row,col));
+                    int k = target_values;
+                    int N_ax = counts[i*dim[1]*dim[2] + j*dim[2] + k];
+                    j = round((cats - 1)*y(row,col));
+                    int N_ay = counts[i*dim[1]*dim[2] + j*dim[2] + k];
+
+                    float temp_dist = dist;
+                    for (intptr_t c = 0; c < target_values; ++c) {
+                        j = round((cats - 1)*x(row,col));
+                        k = c;
+                        int N_axc = counts[i*dim[1]*dim[2] + j*dim[2] + k];
+                        j = round((cats - 1)*y(row,col));
+                        int N_ayc = counts[i*dim[1]*dim[2] + j*dim[2] + k];
+                        dist += std::pow((float) N_axc/N_ax - (float)N_ayc/N_ay, 2);
+                    }
+
+                } else {
+                    dist += std::pow(x(row,col) - y(row,col), 2);
+                }
+            }
+            out(row, 0) = dist;
+        }
+    }
+
+    template <typename T>
+    void operator()(StridedView2D<T> out, StridedView2D<const T> x, StridedView2D<const T> y, StridedView2D<const T> w) const {
+
+        for (intptr_t i = 0; i < 7-1; ++i) {
+            for (intptr_t j = 0; j < 7; ++j) {
+                for (intptr_t k = 0; k < 7; ++k) {
+                    std::cout << "i,j,k: " << i << "," << j << "," << k << "\t" << counts[i*7*7+j*7+k] << std::endl;
+                }
+            }
+            //out(i, 0) = 0;
+        }
+
+        // transform_reduce_2d_(out, x, y, w, [](T x, T y, T w) INLINE_LAMBDA {
+        //     double diff = 0.0;
+        //     if (w == 1) {
+        //         diff = std::abs(x - y) / w;
+        //     } else {
+        //         if (x != y)
+        //             diff = 1.0;
+        //         else
+        //             diff = 0.0;
+        //     }
+        //     return diff * diff;
+        // },
+        // [](T x) { return x;});
     }
 };
 
