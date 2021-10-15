@@ -1,3 +1,5 @@
+Scipy fork to add HEOM, HVDM and VDM metrics inside (to greatly accelerate -- days to minutes -- execution time)
+
 .. raw:: html
 
     <p>
