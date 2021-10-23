@@ -1,4 +1,4 @@
-Scipy fork to add HEOM, HVDM and VDM metrics inside (to greatly accelerate -- days to minutes -- execution time) just go here to see what we changed: https://github.com/cad0p/scipy/tree/master/scipy/spatial/src
+Scipy fork to add HEOM, HVDM and VDM metrics inside (to greatly accelerate -- days to minutes -- execution time) just go here to see what we changed: https://github.com/cad0p/scipy/tree/custom-distance-heom/scipy/spatial/src
 
 .. raw:: html
 
